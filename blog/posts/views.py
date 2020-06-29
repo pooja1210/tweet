@@ -21,25 +21,7 @@ class PostListView(LoginRequiredMixin, ListView):
     context_object_name = 'posts'
     ordering = ['-date_posted']
     paginate_by = PAGINATION_COUNT
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
 
-        all_users = []
-        data_counter = Post.objects.values('author')\
-            .annotate(author_count=Count('author'))\
-            .order_by('-author_count')[:6]
-
-        for aux in data_counter:
-            all_users.append(User.objects.filter(pk=aux['author']).first())
-        # if Preference.objects.get(user = self.request.user):
-        #     data['preference'] = True
-        # else:
-        #     data['preference'] = False
-        data['preference'] = Preference.objects.all()
-        # print(Preference.objects.get(user= self.request.user))
-        data['all_users'] = all_users
-        print(all_users, file=sys.stderr)
-        return data
     def get_queryset(self):
         user = self.request.user
         qs = Follow.objects.filter(user=user)
